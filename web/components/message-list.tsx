@@ -20,8 +20,7 @@ export function WorkStatus({
 }) {
   return (
     <>
-      {children ??
-        (state.metadata?.pendingApproval && <p>Approval needed</p>)}
+      {children ?? (state.metadata?.pendingApproval && <p>Approval needed</p>)}
       {Object.values(state.turns).some((t) => t.status === "queued") && (
         <p className="live-status">Follow-up queued</p>
       )}
@@ -51,9 +50,7 @@ export function MessageList({
 }) {
   // One notice per failed operation kind, anchored to the latest saved message
   // of its own turn (including when no assistant answer has been persisted).
-  const lastMessage = new Map(
-    state.messages.map((m) => [m.turnId, m.entryId]),
-  );
+  const lastMessage = new Map(state.messages.map((m) => [m.turnId, m.entryId]));
   const failures = new Map<string, Set<string>>();
   for (const tool of Object.values(state.tools)) {
     if (tool.status !== "failed") continue;
@@ -83,16 +80,11 @@ export function MessageList({
               <span className="sr-only">
                 {m.role === "user" ? "You" : "Assistant"}
               </span>
-              {m.completionState === "incomplete" && (
-                <span>Incomplete</span>
-              )}
+              {m.completionState === "incomplete" && <span>Incomplete</span>}
             </div>
             <SafeMarkdown text={m.text} />
             {!!m.attachmentIds?.length && (
-              <ul
-                className="saved-attachments"
-                aria-label="Saved attachments"
-              >
+              <ul className="saved-attachments" aria-label="Saved attachments">
                 {m.attachmentIds.map((id) => (
                   <SavedAttachment
                     key={id}
@@ -106,9 +98,7 @@ export function MessageList({
             )}
             {t && labels[t.status] && (
               <p
-                className={
-                  t.status === "failed" ? "warning" : "live-status"
-                }
+                className={t.status === "failed" ? "warning" : "live-status"}
                 role="status"
               >
                 {labels[t.status]}

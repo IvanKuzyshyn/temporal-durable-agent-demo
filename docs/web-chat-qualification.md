@@ -20,7 +20,7 @@ The two deferrals are distinct:
 - This new decision additionally accepts progression despite the observed
   narrow640×160 parent failure: the approved tool returned `hello world`, but the
   saved parent answered `Hello World.\n</think>\n\nI can't directly provide the
-  translation without access to the image text…`. The requested translation-only
+translation without access to the image text…`. The requested translation-only
   final therefore **failed acceptance**. Correct tool output/SQL completion does
   not turn that failed final into a pass.
 
@@ -133,7 +133,7 @@ Vendor metadata was queried on 2026-11-11, rather than guessing release numbers:
   <https://github.com/temporalio/temporal/blob/v1.32.2/config/docker.yaml>.
 - pgx **v5.11.0** and golang-migrate **v4.20.1**: GitHub release metadata and
   `go list -m -json github.com/jackc/pgx/v5@v5.11.0
-  github.com/golang-migrate/migrate/v4@v4.20.1`. Pinned in the manifest for Task 2;
+github.com/golang-migrate/migrate/v4@v4.20.1`. Pinned in the manifest for Task 2;
   deliberately not added as unused dependencies to the existing `go.mod`.
 - Go **1.27.3**, Ollama **0.40.15**, Temporal CLI **1.10.0** are existing pins,
   unchanged. Actual Go and shared Ollama versions were checked. No Go toolchain
@@ -268,7 +268,7 @@ Qwen/Gemma. Measured image increments:
 
 The design's base reserve of **2,384** is demonstrably **not enough for Qwen's
 2048 image**. A candidate conservative starting reserve is **4,608 per Qwen
-image**, **1,536 per Gemma image**, *in addition to* the base reserve. With one
+image**, **1,536 per Gemma image**, _in addition to_ the base reserve. With one
 image, that would limit estimated text to **7,392 / 10,464**, respectively:
 `min(12000, 16384 - 2000 - 2384 - imageReserve)`. Two Qwen images leave 2,784;
 three cannot fit even with zero text and must be rejected or split, not silently

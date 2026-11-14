@@ -120,7 +120,7 @@ not a Task10 summary implementation.
   two allowed names. `Definitions` exposes their exact schemas. `Canonicalize`
   yields bounded canonical arguments and content reference.
 - `WebAdapter` is `func(context.Context, chat.ApprovalScope, json.RawMessage)
-  (chat.WebToolResult,error)`. It must honor cancellation and not return until all
+(chat.WebToolResult,error)`. It must honor cancellation and not return until all
   owned work joins. Task7 must enforce fetch policy; Task8 must checksum/ownership
   check the approved original; Task9 must put children under the same joined
   turn-local cancellation barrier. Passing a scope is not permission for arbitrary

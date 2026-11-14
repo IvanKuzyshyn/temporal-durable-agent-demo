@@ -187,43 +187,558 @@ attachment IDs; they never authorize a new submission under those old limits.
 
 ```json
 {
-  "$schema":"https://json-schema.org/draft/2020-12/schema",
-  "$defs":{
-    "ID":{"type":"string","pattern":"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$","not":{"const":"00000000-0000-0000-0000-000000000000"}},
-    "NullableID":{"anyOf":[{"$ref":"#/$defs/ID"},{"type":"null"}]},
-    "Digest":{"type":"string","pattern":"^[0-9a-f]{64}$"},
-    "DigestAssertion":{"anyOf":[{"$ref":"#/$defs/Digest"},{"const":""}]},
-    "Model":{"enum":["qwen3.5:9b"]},
-    "Time":{"type":"string","format":"date-time"},
-    "Attachments":{"type":"array","maxItems":1,"uniqueItems":true,"items":{"$ref":"#/$defs/ID"}},
-    "Text":{"type":"string","description":"Maximum 65536 UTF-8 bytes"},
-    "CreateRequest":{"type":"object","additionalProperties":false,"required":["requestId"],"properties":{"requestId":{"$ref":"#/$defs/ID"},"model":{"$ref":"#/$defs/Model"},"payloadDigest":{"$ref":"#/$defs/DigestAssertion"}}},
-    "MessageRequest":{"type":"object","additionalProperties":false,"required":["requestId"],"properties":{"requestId":{"$ref":"#/$defs/ID"},"payloadDigest":{"$ref":"#/$defs/DigestAssertion"},"text":{"$ref":"#/$defs/Text"},"attachmentIds":{"$ref":"#/$defs/Attachments"}}},
-    "ReplaceRequest":{"type":"object","additionalProperties":false,"required":["requestId","expectedActiveTurnId"],"properties":{"requestId":{"$ref":"#/$defs/ID"},"payloadDigest":{"$ref":"#/$defs/DigestAssertion"},"expectedActiveTurnId":{"$ref":"#/$defs/ID"},"text":{"$ref":"#/$defs/Text"},"attachmentIds":{"$ref":"#/$defs/Attachments"}}},
-    "StopRequest":{"type":"object","additionalProperties":false,"required":["requestId","expectedActiveTurnId"],"properties":{"requestId":{"$ref":"#/$defs/ID"},"payloadDigest":{"$ref":"#/$defs/DigestAssertion"},"expectedActiveTurnId":{"$ref":"#/$defs/ID"}}},
-    "DecisionRequest":{"type":"object","additionalProperties":false,"required":["requestId","actionHash","decision"],"properties":{"requestId":{"$ref":"#/$defs/ID"},"payloadDigest":{"$ref":"#/$defs/DigestAssertion"},"actionHash":{"$ref":"#/$defs/Digest"},"decision":{"enum":["once","all","deny"]}}},
-    "RevokeRequest":{"type":"object","additionalProperties":false,"required":["requestId"],"properties":{"requestId":{"$ref":"#/$defs/ID"},"payloadDigest":{"$ref":"#/$defs/DigestAssertion"}}},
-    "Conversation":{"type":"object","additionalProperties":false,"required":["id","title","model","workflowId","lifecycle","policyRevision","createdAt","updatedAt"],"properties":{"id":{"$ref":"#/$defs/ID"},"title":{"type":"string"},"model":{"$ref":"#/$defs/Model"},"workflowId":{"type":"string"},"lifecycle":{"enum":["open","closed"]},"policyRevision":{"type":"integer","minimum":0},"createdAt":{"$ref":"#/$defs/Time"},"updatedAt":{"$ref":"#/$defs/Time"}}},
-    "Created":{"type":"object","additionalProperties":false,"required":["conversation","payloadDigest"],"properties":{"conversation":{"$ref":"#/$defs/Conversation"},"payloadDigest":{"$ref":"#/$defs/Digest"}}},
-    "ConversationPage":{"type":"object","additionalProperties":false,"required":["conversations","cursor"],"properties":{"conversations":{"type":"array","maxItems":200,"items":{"$ref":"#/$defs/Conversation"}},"cursor":{"type":"string"}}},
-    "Receipt":{"type":"object","additionalProperties":false,"required":["commandId","turnId","payloadDigest","dispatchState","resultState","result"],"properties":{"commandId":{"$ref":"#/$defs/ID"},"turnId":{"$ref":"#/$defs/NullableID"},"payloadDigest":{"$ref":"#/$defs/Digest"},"dispatchState":{"enum":["pending","dispatched"]},"resultState":{"enum":["pending","accepted","rejected"]},"result":{"type":["object","null"],"description":"Immutable gateway projection; new dispatcher writes GatewayResult. Existing storage projections may have other JSON object fields."}}},
-    "GatewayResult":{"type":"object","additionalProperties":false,"required":["state"],"properties":{"policyRevision":{"type":"integer","minimum":0},"grantedToolset":{"type":"string","maxLength":128},"state":{"enum":["pending","accepted","rejected"]},"code":{"enum":["stale_target","invalid_approval","approval_expired","conversation_closed","policy_conflict","control_conflict","invalid_command"]},"targetTurnId":{"$ref":"#/$defs/ID"},"replacementTurnId":{"$ref":"#/$defs/ID"}},"if":{"properties":{"state":{"const":"rejected"}}},"then":{"required":["code"]}},
-    "Message":{"type":"object","additionalProperties":false,"required":["entryId","conversationId","turnId","role","text","attachmentIds","logicalStep","resultKind","completionState","sequence","createdAt"],"properties":{"entryId":{"$ref":"#/$defs/ID"},"conversationId":{"$ref":"#/$defs/ID"},"turnId":{"$ref":"#/$defs/ID"},"role":{"enum":["user","assistant"]},"text":{"type":"string"},"attachmentIds":{"$ref":"#/$defs/Attachments"},"logicalStep":{"type":"integer","minimum":0},"resultKind":{"type":"string","minLength":1},"completionState":{"enum":["completed","incomplete"]},"turnStatus":{"type":"string"},"turnReason":{"type":"string"},"context":{"anyOf":[{"$ref":"#/$defs/ContextMetadata"},{"type":"null"}]},"sequence":{"type":"integer","minimum":1},"createdAt":{"$ref":"#/$defs/Time"}}},
-    "ContextMetadata":{"type":"object","additionalProperties":false,"required":["coverage","accounting"],"properties":{"coverage":{"type":"object","required":["recentExchanges","omittedExchanges","summaryVersion","summaryBoundary","sourceLimited"],"properties":{"recentExchanges":{"type":"integer"},"omittedExchanges":{"type":"integer"},"summaryVersion":{"type":"integer"},"summaryBoundary":{"type":"integer"},"sourceLimited":{"type":"boolean"},"summaryFailure":{"type":"string"},"outputTruncated":{"type":"boolean"},"evidence":{"$ref":"#/$defs/SourceCoverage"},"quotations":{"$ref":"#/$defs/SourceCoverage"}}},"accounting":{"type":"object","additionalProperties":false,"required":["method","inputTokens","imageTokens","outputTokens","reserve","total"],"properties":{"method":{"type":"string"},"inputTokens":{"type":"integer"},"imageTokens":{"type":"integer"},"outputTokens":{"type":"integer"},"reserve":{"type":"integer"},"total":{"type":"integer"}}}}},
-    "SourceCoverage":{"type":"object","additionalProperties":false,"required":["eligible","included","omitted","deduplicated"],"properties":{"eligible":{"type":"integer"},"included":{"type":["array","null"],"maxItems":4,"items":{"type":"object","description":"Immutable evidence/quotation descriptors as documented in web-chat-context.md; never new original-read authority."}},"omitted":{"type":"integer"},"deduplicated":{"type":"integer"}}},
-    "MessagePage":{"type":"object","additionalProperties":false,"required":["messages","before"],"properties":{"messages":{"type":"array","maxItems":200,"items":{"$ref":"#/$defs/Message"}},"before":{"type":"string"}}},
-    "ActiveTurn":{"type":"object","additionalProperties":false,"required":["id","status","updatedAt"],"properties":{"id":{"$ref":"#/$defs/ID"},"status":{"enum":["running","awaiting_approval","cancelling"]},"updatedAt":{"$ref":"#/$defs/Time"}}},
-    "PendingApproval":{"type":"object","additionalProperties":false,"required":["id","toolCallId","actionHash","deadline","policyRevision","toolName","arguments","contentRef","toolsetVersion"],"properties":{"toolName":{"enum":["web_fetch","file_upload"]},"arguments":{"type":"object"},"contentRef":{"type":"string"},"toolsetVersion":{"type":"string","maxLength":128},"id":{"$ref":"#/$defs/ID"},"toolCallId":{"$ref":"#/$defs/ID"},"actionHash":{"$ref":"#/$defs/Digest"},"deadline":{"$ref":"#/$defs/Time"},"policyRevision":{"type":"integer","minimum":0}}},
-    "Freshness":{"type":"object","additionalProperties":false,"required":["source","authoritative","observedAt","workflowConfirmedAt"],"properties":{"source":{"const":"postgres_projection"},"authoritative":{"const":false},"observedAt":{"$ref":"#/$defs/Time"},"workflowConfirmedAt":{"type":"null"}}},
-    "Metadata":{"type":"object","additionalProperties":false,"required":["conversation","activeTurn","pendingApproval","policy","freshness","dispatcherConnected"],"properties":{"conversation":{"$ref":"#/$defs/Conversation"},"activeTurn":{"anyOf":[{"$ref":"#/$defs/ActiveTurn"},{"type":"null"}]},"pendingApproval":{"anyOf":[{"$ref":"#/$defs/PendingApproval"},{"type":"null"}]},"policy":{"type":"object","additionalProperties":false,"required":["revision","approvalAll","toolsetVersion"],"properties":{"revision":{"type":"integer","minimum":0},"approvalAll":{"type":"boolean"},"toolsetVersion":{"type":"string","maxLength":128}}},"freshness":{"$ref":"#/$defs/Freshness"},"dispatcherConnected":{"type":"boolean"}}},
-    "Models":{"type":"object","additionalProperties":false,"required":["models"],"properties":{"models":{"type":"array","minItems":1,"maxItems":1,"items":{"type":"object","additionalProperties":false,"required":["id","default","availability","capabilities"],"properties":{"id":{"$ref":"#/$defs/Model"},"default":{"type":"boolean"},"availability":{"const":"unknown"},"capabilities":{"type":"object","additionalProperties":false,"required":["text","tools","images","imageAdmissionQualified"],"properties":{"text":{"const":"unverified"},"tools":{"const":"unverified"},"images":{"const":"unverified"},"imageAdmissionQualified":{"const":false}}}}}}}},
-    "Health":{"type":"object","additionalProperties":false,"required":["alive","storageReady","acceptingCommands","dispatcher","workersPolling","reconciliationReady"],"properties":{"alive":{"const":true},"storageReady":{"type":"boolean"},"acceptingCommands":{"type":"boolean"},"dispatcher":{"enum":["unavailable","connected"]},"workersPolling":{"type":"boolean"},"reconciliationReady":{"type":"boolean"}}},
-    "Error":{"type":"object","additionalProperties":false,"required":["error"],"properties":{"error":{"type":"object","additionalProperties":false,"required":["code"],"properties":{"code":{"enum":["forbidden","invalid_request","invalid_json","invalid_query","not_found","reference_not_found","conflict","body_too_large","prompt_too_large","unsupported_media_type","storage_unavailable","not_implemented","method_not_allowed","attachment_store_unavailable","multipart_required","one_file_required","file_exceeds_1048576_bytes","invalid_signature_or_unreadable_file","upstream_unavailable"]}}}}},
-    "Attachment":{"type":"object","additionalProperties":false,"required":["id","conversationId","name","mediaType","size","checksum","status"],"properties":{"id":{"$ref":"#/$defs/ID"},"conversationId":{"$ref":"#/$defs/ID"},"name":{"type":"string"},"mediaType":{"enum":["text/plain","text/markdown","application/pdf","application/vnd.openxmlformats-officedocument.wordprocessingml.document","image/png","image/jpeg","image/svg+xml"]},"size":{"type":"integer","minimum":0,"maximum":1048576},"checksum":{"type":"string","pattern":"^[0-9a-f]{64}$"},"status":{"const":"ready"}}},
-    "AttachmentResponse":{"type":"object","additionalProperties":false,"required":["attachment"],"properties":{"attachment":{"$ref":"#/$defs/Attachment"}}},
-    "AttachmentLabel":{"type":"object","additionalProperties":false,"required":["id","conversationId","name","uploadNumber"],"properties":{"id":{"$ref":"#/$defs/ID"},"conversationId":{"$ref":"#/$defs/ID"},"name":{"type":"string"},"uploadNumber":{"type":"integer","minimum":1}}},
-    "AttachmentLabelResponse":{"type":"object","additionalProperties":false,"required":["attachment"],"properties":{"attachment":{"$ref":"#/$defs/AttachmentLabel"}}},
-    "Event":{"type":"object","additionalProperties":false,"required":["id","conversationId","turnId","stepId","attempt","type","data"],"properties":{"id":{"type":"string","pattern":"^(0|[1-9][0-9]*)$"},"conversationId":{"$ref":"#/$defs/ID"},"turnId":{"$ref":"#/$defs/NullableID"},"stepId":{"type":["integer","null"],"minimum":0},"attempt":{"type":["integer","null"],"minimum":1},"type":{"type":"string","minLength":1},"data":{"type":["object","null"],"description":"Snapshot, bounded cumulative message.delta, or durable lifecycle payload. See web-chat-streaming.md and web/lib/contracts.ts."}}}
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "ID": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+      "not": { "const": "00000000-0000-0000-0000-000000000000" }
+    },
+    "NullableID": { "anyOf": [{ "$ref": "#/$defs/ID" }, { "type": "null" }] },
+    "Digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "DigestAssertion": {
+      "anyOf": [{ "$ref": "#/$defs/Digest" }, { "const": "" }]
+    },
+    "Model": { "enum": ["qwen3.5:9b"] },
+    "Time": { "type": "string", "format": "date-time" },
+    "Attachments": {
+      "type": "array",
+      "maxItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/ID" }
+    },
+    "Text": { "type": "string", "description": "Maximum 65536 UTF-8 bytes" },
+    "CreateRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requestId"],
+      "properties": {
+        "requestId": { "$ref": "#/$defs/ID" },
+        "model": { "$ref": "#/$defs/Model" },
+        "payloadDigest": { "$ref": "#/$defs/DigestAssertion" }
+      }
+    },
+    "MessageRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requestId"],
+      "properties": {
+        "requestId": { "$ref": "#/$defs/ID" },
+        "payloadDigest": { "$ref": "#/$defs/DigestAssertion" },
+        "text": { "$ref": "#/$defs/Text" },
+        "attachmentIds": { "$ref": "#/$defs/Attachments" }
+      }
+    },
+    "ReplaceRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requestId", "expectedActiveTurnId"],
+      "properties": {
+        "requestId": { "$ref": "#/$defs/ID" },
+        "payloadDigest": { "$ref": "#/$defs/DigestAssertion" },
+        "expectedActiveTurnId": { "$ref": "#/$defs/ID" },
+        "text": { "$ref": "#/$defs/Text" },
+        "attachmentIds": { "$ref": "#/$defs/Attachments" }
+      }
+    },
+    "StopRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requestId", "expectedActiveTurnId"],
+      "properties": {
+        "requestId": { "$ref": "#/$defs/ID" },
+        "payloadDigest": { "$ref": "#/$defs/DigestAssertion" },
+        "expectedActiveTurnId": { "$ref": "#/$defs/ID" }
+      }
+    },
+    "DecisionRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requestId", "actionHash", "decision"],
+      "properties": {
+        "requestId": { "$ref": "#/$defs/ID" },
+        "payloadDigest": { "$ref": "#/$defs/DigestAssertion" },
+        "actionHash": { "$ref": "#/$defs/Digest" },
+        "decision": { "enum": ["once", "all", "deny"] }
+      }
+    },
+    "RevokeRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requestId"],
+      "properties": {
+        "requestId": { "$ref": "#/$defs/ID" },
+        "payloadDigest": { "$ref": "#/$defs/DigestAssertion" }
+      }
+    },
+    "Conversation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "model",
+        "workflowId",
+        "lifecycle",
+        "policyRevision",
+        "createdAt",
+        "updatedAt"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/ID" },
+        "title": { "type": "string" },
+        "model": { "$ref": "#/$defs/Model" },
+        "workflowId": { "type": "string" },
+        "lifecycle": { "enum": ["open", "closed"] },
+        "policyRevision": { "type": "integer", "minimum": 0 },
+        "createdAt": { "$ref": "#/$defs/Time" },
+        "updatedAt": { "$ref": "#/$defs/Time" }
+      }
+    },
+    "Created": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conversation", "payloadDigest"],
+      "properties": {
+        "conversation": { "$ref": "#/$defs/Conversation" },
+        "payloadDigest": { "$ref": "#/$defs/Digest" }
+      }
+    },
+    "ConversationPage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conversations", "cursor"],
+      "properties": {
+        "conversations": {
+          "type": "array",
+          "maxItems": 200,
+          "items": { "$ref": "#/$defs/Conversation" }
+        },
+        "cursor": { "type": "string" }
+      }
+    },
+    "Receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commandId",
+        "turnId",
+        "payloadDigest",
+        "dispatchState",
+        "resultState",
+        "result"
+      ],
+      "properties": {
+        "commandId": { "$ref": "#/$defs/ID" },
+        "turnId": { "$ref": "#/$defs/NullableID" },
+        "payloadDigest": { "$ref": "#/$defs/Digest" },
+        "dispatchState": { "enum": ["pending", "dispatched"] },
+        "resultState": { "enum": ["pending", "accepted", "rejected"] },
+        "result": {
+          "type": ["object", "null"],
+          "description": "Immutable gateway projection; new dispatcher writes GatewayResult. Existing storage projections may have other JSON object fields."
+        }
+      }
+    },
+    "GatewayResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state"],
+      "properties": {
+        "policyRevision": { "type": "integer", "minimum": 0 },
+        "grantedToolset": { "type": "string", "maxLength": 128 },
+        "state": { "enum": ["pending", "accepted", "rejected"] },
+        "code": {
+          "enum": [
+            "stale_target",
+            "invalid_approval",
+            "approval_expired",
+            "conversation_closed",
+            "policy_conflict",
+            "control_conflict",
+            "invalid_command"
+          ]
+        },
+        "targetTurnId": { "$ref": "#/$defs/ID" },
+        "replacementTurnId": { "$ref": "#/$defs/ID" }
+      },
+      "if": { "properties": { "state": { "const": "rejected" } } },
+      "then": { "required": ["code"] }
+    },
+    "Message": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entryId",
+        "conversationId",
+        "turnId",
+        "role",
+        "text",
+        "attachmentIds",
+        "logicalStep",
+        "resultKind",
+        "completionState",
+        "sequence",
+        "createdAt"
+      ],
+      "properties": {
+        "entryId": { "$ref": "#/$defs/ID" },
+        "conversationId": { "$ref": "#/$defs/ID" },
+        "turnId": { "$ref": "#/$defs/ID" },
+        "role": { "enum": ["user", "assistant"] },
+        "text": { "type": "string" },
+        "attachmentIds": { "$ref": "#/$defs/Attachments" },
+        "logicalStep": { "type": "integer", "minimum": 0 },
+        "resultKind": { "type": "string", "minLength": 1 },
+        "completionState": { "enum": ["completed", "incomplete"] },
+        "turnStatus": { "type": "string" },
+        "turnReason": { "type": "string" },
+        "context": {
+          "anyOf": [{ "$ref": "#/$defs/ContextMetadata" }, { "type": "null" }]
+        },
+        "sequence": { "type": "integer", "minimum": 1 },
+        "createdAt": { "$ref": "#/$defs/Time" }
+      }
+    },
+    "ContextMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["coverage", "accounting"],
+      "properties": {
+        "coverage": {
+          "type": "object",
+          "required": [
+            "recentExchanges",
+            "omittedExchanges",
+            "summaryVersion",
+            "summaryBoundary",
+            "sourceLimited"
+          ],
+          "properties": {
+            "recentExchanges": { "type": "integer" },
+            "omittedExchanges": { "type": "integer" },
+            "summaryVersion": { "type": "integer" },
+            "summaryBoundary": { "type": "integer" },
+            "sourceLimited": { "type": "boolean" },
+            "summaryFailure": { "type": "string" },
+            "outputTruncated": { "type": "boolean" },
+            "evidence": { "$ref": "#/$defs/SourceCoverage" },
+            "quotations": { "$ref": "#/$defs/SourceCoverage" }
+          }
+        },
+        "accounting": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "method",
+            "inputTokens",
+            "imageTokens",
+            "outputTokens",
+            "reserve",
+            "total"
+          ],
+          "properties": {
+            "method": { "type": "string" },
+            "inputTokens": { "type": "integer" },
+            "imageTokens": { "type": "integer" },
+            "outputTokens": { "type": "integer" },
+            "reserve": { "type": "integer" },
+            "total": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "SourceCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eligible", "included", "omitted", "deduplicated"],
+      "properties": {
+        "eligible": { "type": "integer" },
+        "included": {
+          "type": ["array", "null"],
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "description": "Immutable evidence/quotation descriptors as documented in web-chat-context.md; never new original-read authority."
+          }
+        },
+        "omitted": { "type": "integer" },
+        "deduplicated": { "type": "integer" }
+      }
+    },
+    "MessagePage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["messages", "before"],
+      "properties": {
+        "messages": {
+          "type": "array",
+          "maxItems": 200,
+          "items": { "$ref": "#/$defs/Message" }
+        },
+        "before": { "type": "string" }
+      }
+    },
+    "ActiveTurn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status", "updatedAt"],
+      "properties": {
+        "id": { "$ref": "#/$defs/ID" },
+        "status": { "enum": ["running", "awaiting_approval", "cancelling"] },
+        "updatedAt": { "$ref": "#/$defs/Time" }
+      }
+    },
+    "PendingApproval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "toolCallId",
+        "actionHash",
+        "deadline",
+        "policyRevision",
+        "toolName",
+        "arguments",
+        "contentRef",
+        "toolsetVersion"
+      ],
+      "properties": {
+        "toolName": { "enum": ["web_fetch", "file_upload"] },
+        "arguments": { "type": "object" },
+        "contentRef": { "type": "string" },
+        "toolsetVersion": { "type": "string", "maxLength": 128 },
+        "id": { "$ref": "#/$defs/ID" },
+        "toolCallId": { "$ref": "#/$defs/ID" },
+        "actionHash": { "$ref": "#/$defs/Digest" },
+        "deadline": { "$ref": "#/$defs/Time" },
+        "policyRevision": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "Freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "authoritative",
+        "observedAt",
+        "workflowConfirmedAt"
+      ],
+      "properties": {
+        "source": { "const": "postgres_projection" },
+        "authoritative": { "const": false },
+        "observedAt": { "$ref": "#/$defs/Time" },
+        "workflowConfirmedAt": { "type": "null" }
+      }
+    },
+    "Metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "conversation",
+        "activeTurn",
+        "pendingApproval",
+        "policy",
+        "freshness",
+        "dispatcherConnected"
+      ],
+      "properties": {
+        "conversation": { "$ref": "#/$defs/Conversation" },
+        "activeTurn": {
+          "anyOf": [{ "$ref": "#/$defs/ActiveTurn" }, { "type": "null" }]
+        },
+        "pendingApproval": {
+          "anyOf": [{ "$ref": "#/$defs/PendingApproval" }, { "type": "null" }]
+        },
+        "policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["revision", "approvalAll", "toolsetVersion"],
+          "properties": {
+            "revision": { "type": "integer", "minimum": 0 },
+            "approvalAll": { "type": "boolean" },
+            "toolsetVersion": { "type": "string", "maxLength": 128 }
+          }
+        },
+        "freshness": { "$ref": "#/$defs/Freshness" },
+        "dispatcherConnected": { "type": "boolean" }
+      }
+    },
+    "Models": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["models"],
+      "properties": {
+        "models": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "default", "availability", "capabilities"],
+            "properties": {
+              "id": { "$ref": "#/$defs/Model" },
+              "default": { "type": "boolean" },
+              "availability": { "const": "unknown" },
+              "capabilities": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "text",
+                  "tools",
+                  "images",
+                  "imageAdmissionQualified"
+                ],
+                "properties": {
+                  "text": { "const": "unverified" },
+                  "tools": { "const": "unverified" },
+                  "images": { "const": "unverified" },
+                  "imageAdmissionQualified": { "const": false }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Health": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "alive",
+        "storageReady",
+        "acceptingCommands",
+        "dispatcher",
+        "workersPolling",
+        "reconciliationReady"
+      ],
+      "properties": {
+        "alive": { "const": true },
+        "storageReady": { "type": "boolean" },
+        "acceptingCommands": { "type": "boolean" },
+        "dispatcher": { "enum": ["unavailable", "connected"] },
+        "workersPolling": { "type": "boolean" },
+        "reconciliationReady": { "type": "boolean" }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["error"],
+      "properties": {
+        "error": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code"],
+          "properties": {
+            "code": {
+              "enum": [
+                "forbidden",
+                "invalid_request",
+                "invalid_json",
+                "invalid_query",
+                "not_found",
+                "reference_not_found",
+                "conflict",
+                "body_too_large",
+                "prompt_too_large",
+                "unsupported_media_type",
+                "storage_unavailable",
+                "not_implemented",
+                "method_not_allowed",
+                "attachment_store_unavailable",
+                "multipart_required",
+                "one_file_required",
+                "file_exceeds_1048576_bytes",
+                "invalid_signature_or_unreadable_file",
+                "upstream_unavailable"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "Attachment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "conversationId",
+        "name",
+        "mediaType",
+        "size",
+        "checksum",
+        "status"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/ID" },
+        "conversationId": { "$ref": "#/$defs/ID" },
+        "name": { "type": "string" },
+        "mediaType": {
+          "enum": [
+            "text/plain",
+            "text/markdown",
+            "application/pdf",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "image/png",
+            "image/jpeg",
+            "image/svg+xml"
+          ]
+        },
+        "size": { "type": "integer", "minimum": 0, "maximum": 1048576 },
+        "checksum": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "status": { "const": "ready" }
+      }
+    },
+    "AttachmentResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attachment"],
+      "properties": { "attachment": { "$ref": "#/$defs/Attachment" } }
+    },
+    "AttachmentLabel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "conversationId", "name", "uploadNumber"],
+      "properties": {
+        "id": { "$ref": "#/$defs/ID" },
+        "conversationId": { "$ref": "#/$defs/ID" },
+        "name": { "type": "string" },
+        "uploadNumber": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "AttachmentLabelResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attachment"],
+      "properties": { "attachment": { "$ref": "#/$defs/AttachmentLabel" } }
+    },
+    "Event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "conversationId",
+        "turnId",
+        "stepId",
+        "attempt",
+        "type",
+        "data"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^(0|[1-9][0-9]*)$" },
+        "conversationId": { "$ref": "#/$defs/ID" },
+        "turnId": { "$ref": "#/$defs/NullableID" },
+        "stepId": { "type": ["integer", "null"], "minimum": 0 },
+        "attempt": { "type": ["integer", "null"], "minimum": 1 },
+        "type": { "type": "string", "minLength": 1 },
+        "data": {
+          "type": ["object", "null"],
+          "description": "Snapshot, bounded cumulative message.delta, or durable lifecycle payload. See web-chat-streaming.md and web/lib/contracts.ts."
+        }
+      }
+    }
   }
 }
 ```

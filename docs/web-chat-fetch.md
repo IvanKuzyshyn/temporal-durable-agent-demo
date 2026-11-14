@@ -107,7 +107,7 @@ pass; neither mapped nor retired addresses are unmapped or retried as public.
 ## APIs and test seams
 
 - `tools.FetchArgs{URL string}` and `tools.FetchResult{RequestedURL, FinalURL,
-  ContentType, Text string; Truncated bool}`.
+ContentType, Text string; Truncated bool}`.
 - `tools.NewFetcher().Fetch(ctx,args)` is the production network primitive. It does
   not itself grant consent; use it through the authorized activity adapter.
 - `tools.NewFetcherWithNetwork(lookup,dial)` injects DNS and a literal-address

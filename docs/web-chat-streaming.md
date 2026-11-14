@@ -57,7 +57,15 @@ cancellation. It bounds initial upstream connection/header waiting to ten second
 Every `data:` line is an envelope:
 
 ```json
-{"id":"42","conversationId":"uuid","turnId":null,"stepId":null,"attempt":null,"type":"snapshot","data":{}}
+{
+  "id": "42",
+  "conversationId": "uuid",
+  "turnId": null,
+  "stepId": null,
+  "attempt": null,
+  "type": "snapshot",
+  "data": {}
+}
 ```
 
 The SSE `id:` is the same decimal event watermark. It is a string in the browser,
@@ -77,6 +85,7 @@ history. A completed model attempt is not itself a saved reply: only an immutabl
 assistant message is labeled **Saved reply**.
 
 Snapshot data contains:
+
 - `reset`, conversation `metadata` (active turn, pending approval and policy);
 - latest 20 canonical `messages`, with exclusive older-page `before` cursor;
 - latest 200 turn projections, 200 command receipts, 32 tool records;

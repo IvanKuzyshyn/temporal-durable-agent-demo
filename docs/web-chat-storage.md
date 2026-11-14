@@ -96,7 +96,7 @@ silently substituting Qwen. Historical model identities remain readable.
   is made here. Consumers must process the bounded batch, not stop at its first
   pending item.
 - `RecordCommandResult(ctx, conversationID, commandID, dispatchState, resultState,
-  body []byte) error` monotonically records `pending|dispatched` and
+body []byte) error` monotonically records `pending|dispatched` and
   `pending|accepted|rejected`. A terminal receipt is immutable; identical retries
   succeed. This result describes workflow acceptance/rejection, not a completed
   assistant response. No turn execution projection changes automatically.
@@ -106,7 +106,7 @@ silently substituting Qwen. Historical model identities remain readable.
   EntryID for the same logical result conflicts. A partial draft must use a
   distinct result kind/entry from the final result; preferably use attempt events.
 - `ListMessages(ctx, conversationID, before string, limit int)
-  (chat.MessagePage, error)` returns each page oldest-to-newest. Empty `before`
+(chat.MessagePage, error)` returns each page oldest-to-newest. Empty `before`
   means the newest page; returned `Before` fetches the next older page. Limits
   are 1–200. Cursors are opaque, versioned, and conversation-bound.
 
@@ -165,7 +165,6 @@ cleanup evidence. Pre-upgrade active work may require operator investigation;
 there is no old workflow-history compatibility/reset promise. Down migration
 removes only the new ledger/column; downgrade must not run alongside active workers.
 
-
 - `BeginChatModelAttempt(ctx, chat.ModelAttempt) (cached bool, err error)` is the
   text-chat registration path. It atomically checks the canonical candidate,
   registers the new running attempt and fences older attempts under the same
@@ -178,23 +177,23 @@ removes only the new ledger/column; downgrade must not run alongside active work
 - `RecordModelAttempt(ctx, chat.ModelAttempt) error` registers a running attempt
   or an already-settled snapshot; `(turn, logical step, attempt)` is unique.
 - `CompleteModelAttempt(ctx, conversationID, id, status string, usage []byte,
-  resultEntryID, reason string) error` settles a running attempt exactly once.
+resultEntryID, reason string) error` settles a running attempt exactly once.
   A result reference must belong to that conversation **and turn**.
 - `RecordToolCall(ctx, chat.ToolCall) error` registers the immutable action and
   optional settled snapshot; `(turn, logical key)` is unique.
 - `CompleteToolCall(ctx, conversationID, id, status string, result, sources []byte)
-  error` settles pending/running calls exactly once. Terminal outcomes are
+error` settles pending/running calls exactly once. Terminal outcomes are
   `completed|failed|denied|cancelled`.
 - `RecordApproval(ctx, chat.Approval) error` registers a workflow projection,
   binding conversation, tool ID, action hash, deadline, and revision.
 - `RecordApprovalDecision(ctx, conversationID, id string, decision
-  chat.ApprovalDecision, revision int64, at time.Time) error` records a previously
+chat.ApprovalDecision, revision int64, at time.Time) error` records a previously
   adjudicated decision exactly once. It never grants consent or changes policy.
 - `SaveSummary(ctx, chat.Summary) error` writes immutable versions with a valid
   same-conversation covered-message sequence and the conversation's exact model.
 - `LatestSummary(ctx, conversationID) (chat.Summary, error)` reads the latest.
 - `AppendEvent(ctx, chat.Event) error` writes a stable-ID event; `(logical step,
-  attempt)` is optional but, when present, references a registered model attempt.
+attempt)` is optional but, when present, references a registered model attempt.
 - `ListEvents(ctx, conversationID, after int64, limit int) ([]chat.Event, error)`
   replays ascending sequence, exclusively after the supplied sequence.
 
