@@ -2,7 +2,7 @@
 
 These are actual Task12 captures from the exact 640×160 `scripts/testdata/bonjour.png` profile, not generated fixtures or a new qualification run. Correct English translation is `Hello world`. The parent user instruction is unchanged. The Qwen failure remains R2 **OPEN**. No arbitrary-image qualification is implied.
 
-Canonical evidence root: `web-chat-00-design/.superpowers/sdd/2026-11-11-web-chat/task-12-evidence/` (sibling controller worktree, outside this source commit).
+The original controller-worktree evidence was archived during repository cleanup. The immutable copies listed below remain in this directory; their original relative filenames and SHA256 hashes are preserved for provenance.
 
 - `qwen-narrow-parent-failure.json`: `verified/agent-qwen-native-history.json`; SHA256 `9000e6e3137938d41a3a86d4ade6f5f901cb843471eecc0e06cf65c2dde6e637`. Actual saved messages and rendered tool JSON. Completed parent contains `Hello World.`, stray `</think>`, then contradictory inability to provide the translation. This MUST FAIL full-answer acceptance.
 - `qwen-narrow-parent-conforming-dom.json`: `agent-qwen-image-result.json`; SHA256 `5b94ee70427fef397f19a47100d85edf881cc835d02987244d293fb22e48f916`. Earlier **different conversation**, DOM-only capture, `HELLO WORLD`. No SQL/provider record is invented for this sample. Passing it cannot resolve the retained later failure.
