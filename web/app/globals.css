@@ -189,20 +189,6 @@ textarea:focus-visible {
   line-height: 20px;
   font-size: 13px;
 }
-.sidebar-footer {
-  margin-top: auto;
-  border-top: 1px solid var(--line);
-  padding: 16px;
-  height: 53px;
-  display: flex;
-  gap: 9px;
-  align-items: center;
-  font-size: 12px;
-}
-.sidebar-footer svg {
-  width: 18px;
-  height: 18px;
-}
 .collapsed .brand {
   padding: 8px;
 }
@@ -210,8 +196,7 @@ textarea:focus-visible {
 .collapsed .brand-name,
 .collapsed .new-chat span,
 .collapsed .sidebar-caption,
-.collapsed .sidebar nav,
-.collapsed .sidebar-footer span {
+.collapsed .sidebar nav {
   display: none;
 }
 .collapsed .desktop-toggle {
@@ -220,9 +205,6 @@ textarea:focus-visible {
 .collapsed .new-chat {
   padding: 7px;
   width: 32px;
-}
-.collapsed .sidebar-footer {
-  padding: 15px;
 }
 .mobile-close,
 .sidebar-shade {
@@ -715,8 +697,7 @@ main {
     z-index: 30;
   }
   .sidebar.open .brand-name,
-  .sidebar.open .new-chat span,
-  .sidebar.open .sidebar-footer span {
+  .sidebar.open .new-chat span {
     display: inline;
   }
   .sidebar.open .brand > svg {
@@ -733,9 +714,6 @@ main {
   }
   .sidebar.open .brand {
     padding: 8px 16px;
-  }
-  .sidebar.open .sidebar-footer {
-    padding: 16px;
   }
   .desktop-toggle {
     display: none;
