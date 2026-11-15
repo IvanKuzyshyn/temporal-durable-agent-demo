@@ -144,9 +144,7 @@ async function fixture(page: Page) {
     return route.fulfill({ json: s.metadata });
   });
   await page.goto(`/chat/${id}`);
-  await expect(
-    page.getByRole("textbox", { name: "Message" }),
-  ).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Message" })).toBeVisible();
   await expect(
     page.getByRole("region", { name: "Approval needed" }),
   ).toBeVisible();
@@ -283,9 +281,7 @@ test("older duplicate-name attachment stays identifiable on narrow reload withou
 
 test("approvalOnceAndAll", async ({ page }) => {
   const f = await fixture(page);
-  await page
-    .getByRole("button", { name: "Approve once", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Approve once", exact: true }).click();
   await expect.poll(() => f.posts.length).toBe(1);
   expect(f.posts[0].body).toMatchObject({
     actionHash: "a".repeat(64),
@@ -351,9 +347,7 @@ test("replaceDoesNotCancelNewerTurn", async ({ page }) => {
   };
   await f.refresh(f.state);
   await expect(
-    page.getByText(
-      "An action could not be completed. Refresh and try again.",
-    ),
+    page.getByText("An action could not be completed. Refresh and try again."),
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Stop current turn" }),
@@ -365,21 +359,15 @@ test("uploadAndTranslateImage", async ({ page }) => {
   await page.getByLabel("Attach files").setInputFiles({
     name: "text.png",
     mimeType: "image/png",
-    buffer: Buffer.from(
-      "test fixture; server validation separately tested",
-    ),
+    buffer: Buffer.from("test fixture; server validation separately tested"),
   });
   await page.getByRole("button", { name: "Preview raster" }).click();
   const image = page.getByRole("img", { name: "Preview of text.png" });
   await expect(image).toBeVisible();
   await expect
-    .poll(() =>
-      image.evaluate((el) => (el as HTMLImageElement).naturalWidth),
-    )
+    .poll(() => image.evaluate((el) => (el as HTMLImageElement).naturalWidth))
     .toBe(1);
-  await page
-    .getByRole("textbox")
-    .fill("Translate visible text into English.");
+  await page.getByRole("textbox").fill("Translate visible text into English.");
   await page.getByRole("button", { name: "Send message" }).click();
   await expect.poll(() => f.posts.length).toBe(1);
   expect(f.posts[0].body.attachmentIds).toEqual([file]);
@@ -430,9 +418,7 @@ test("switchChatRetainsDraft", async ({ page }) => {
   await page.getByRole("textbox").fill("Unsent draft");
   await page.getByRole("link", { name: "New chat", exact: true }).click();
   await page.getByRole("button", { name: "Toggle sidebar" }).click();
-  await page
-    .getByRole("link", { name: /Durable interaction fixture/ })
-    .click();
+  await page.getByRole("link", { name: /Durable interaction fixture/ }).click();
   await expect(page.getByRole("textbox")).toHaveValue("Unsent draft");
 });
 test("pendingApprovalAlwaysVisible and keyboard/narrow layout", async ({
@@ -450,9 +436,7 @@ test("pendingApprovalAlwaysVisible and keyboard/narrow layout", async ({
   }));
   await f.refresh(f.state);
   await expect(
-    page.getByText(
-      "An action could not be completed. Refresh and try again.",
-    ),
+    page.getByText("An action could not be completed. Refresh and try again."),
   ).toHaveCount(1);
   await expect(page.locator("details")).toHaveCount(0);
   await expect(
@@ -469,18 +453,14 @@ test("pendingApprovalAlwaysVisible and keyboard/narrow layout", async ({
     "Deny",
   ]) {
     expect(
-      await page
-        .getByRole("button", { name, exact: true })
-        .evaluate((el) => {
-          const button = el.getBoundingClientRect(),
-            panel = el.closest(".approval-card")!.getBoundingClientRect();
-          return button.top >= panel.top && button.bottom <= panel.bottom;
-        }),
+      await page.getByRole("button", { name, exact: true }).evaluate((el) => {
+        const button = el.getBoundingClientRect(),
+          panel = el.closest(".approval-card")!.getBoundingClientRect();
+        return button.top >= panel.top && button.bottom <= panel.bottom;
+      }),
     ).toBe(true);
   }
-  await page
-    .getByRole("button", { name: "Approve once", exact: true })
-    .focus();
+  await page.getByRole("button", { name: "Approve once", exact: true }).focus();
   await expect(
     page.getByRole("button", { name: "Approve once", exact: true }),
   ).toBeFocused();
@@ -588,9 +568,7 @@ test("legacy multi-file pending draft requires explicit edit and removal before 
   );
   await page.reload();
   await expect(page.getByText(/one attachment per message/)).toBeVisible();
-  await page
-    .getByRole("button", { name: "Retry saved submission" })
-    .click();
+  await page.getByRole("button", { name: "Retry saved submission" }).click();
   expect(f.posts).toHaveLength(0);
   await page.getByRole("button", { name: "Edit saved submission" }).click();
   await page.getByRole("button", { name: "Remove two.txt" }).click();

@@ -71,7 +71,11 @@ services:
     volumes:
       - ./infra/temporal.yaml:/etc/temporal/webchat.yaml:ro
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:7243/api/v1/system-info"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q -O /dev/null http://127.0.0.1:7243/api/v1/system-info",
+        ]
       interval: 5s
       timeout: 3s
       retries: 40

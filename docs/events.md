@@ -46,6 +46,6 @@ For reconnect, create `NewReconnect()`, call `Buffer([]Event) error` while the s
 
 ## Reconnect contract
 
-Start tailing at the saved byte offset *before* querying state, buffer events, render the authoritative state, then apply only events with seq greater than state.lastSeq. A sequence gap triggers a new state query. Do not parse an incomplete line until its LF arrives. Streaming is display-only and may lose data; final answers come from state/results. Activity retries can restart a turn, so a fresh message_start invalidates the old partial display.
+Start tailing at the saved byte offset _before_ querying state, buffer events, render the authoritative state, then apply only events with seq greater than state.lastSeq. A sequence gap triggers a new state query. Do not parse an incomplete line until its LF arrives. Streaming is display-only and may lose data; final answers come from state/results. Activity retries can restart a turn, so a fresh message_start invalidates the old partial display.
 
 Full transcripts, partial text and command logs are artifacts, never embedded into workflow history. Event payloads and summaries are bounded; large output is referenced by path.

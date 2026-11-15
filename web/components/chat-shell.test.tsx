@@ -123,9 +123,14 @@ beforeEach(() => {
       sent.push(intent);
       return post(intent);
     }
-    for (const [id, name] of [["file-a", "document.txt"], ["image-ready", "text.png"]]) {
+    for (const [id, name] of [
+      ["file-a", "document.txt"],
+      ["image-ready", "text.png"],
+    ]) {
       if (input === `/api/conversations/a/attachments/${id}/metadata`)
-        return Response.json({ attachment: { id, conversationId: "a", name, uploadNumber: 1 } });
+        return Response.json({
+          attachment: { id, conversationId: "a", name, uploadNumber: 1 },
+        });
     }
     if (input.includes("/commands/") && commandGet) return commandGet();
     if (input.includes("/messages?")) return history();
@@ -601,7 +606,9 @@ it("reopenAttachmentFollowUp uses canonical history IDs without local upload mem
     ],
   });
   fireEvent.click(
-    await screen.findByRole("button", { name: "Attach again text.png · Upload 1" }),
+    await screen.findByRole("button", {
+      name: "Attach again text.png · Upload 1",
+    }),
   );
   await submit("Describe the same image.");
   expect(sent[0].attachmentIds).toEqual(["image-ready"]);

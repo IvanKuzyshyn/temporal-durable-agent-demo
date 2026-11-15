@@ -68,8 +68,8 @@ export function ApprovalCard({
       </p>
       {(expired || stale) && (
         <p className="warning" role="status">
-          {expired ? "Approval expired." : "Approval scope is stale."}{" "}
-          Waiting for refreshed saved state; no new permission was granted.
+          {expired ? "Approval expired." : "Approval scope is stale."} Waiting
+          for refreshed saved state; no new permission was granted.
         </p>
       )}
       <div className="action-row">
@@ -100,8 +100,8 @@ export function ApprovalCard({
         </button>
       </div>
       <p className="scope-line">
-        Approve all allows web pages and attachments in this conversation
-        until revoked.
+        Approve all allows web pages and attachments in this conversation until
+        revoked.
       </p>
     </section>
   );

@@ -52,11 +52,7 @@ export function useAttachmentLabel(
       controller.abort();
     };
   }, [conversationId, attachmentId, key, valid]);
-  return !valid
-    ? { key, failed: true }
-    : state.key === key
-      ? state
-      : { key };
+  return !valid ? { key, failed: true } : state.key === key ? state : { key };
 }
 
 export function SavedAttachment({
@@ -75,9 +71,7 @@ export function SavedAttachment({
     <li>
       <span className="attachment-identity">
         {label ??
-          (failed
-            ? "Attachment name unavailable"
-            : "Loading attachment name…")}
+          (failed ? "Attachment name unavailable" : "Loading attachment name…")}
       </span>
       {onAttach && (
         <button

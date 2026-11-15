@@ -137,9 +137,7 @@ it("does not grant permission while identity is loading or metadata fails; denia
     }),
   );
   render(card());
-  expect(
-    screen.getByRole("button", { name: "Approve once" }),
-  ).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Approve once" })).toBeDisabled();
   expect(
     screen.getByRole("button", {
       name: "Approve all for this conversation",
@@ -150,9 +148,7 @@ it("does not grant permission while identity is loading or metadata fails; denia
   expect(
     screen.getByText(/Cannot identify the requested attachment/),
   ).toBeVisible();
-  expect(
-    screen.getByRole("button", { name: "Approve once" }),
-  ).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Approve once" })).toBeDisabled();
   expect(document.body).not.toHaveTextContent("private-network-error");
 });
 
@@ -177,26 +173,16 @@ it.each(["conversation", "target", "approval"])(
     const conversationId = change === "conversation" ? "chat-b" : "chat-a";
     rerender(card(next, conversationId));
     await waitFor(() => expect(replies).toHaveLength(2));
-    await act(async () =>
-      replies[0](response("older", "chat-a", "stale.txt")),
-    );
+    await act(async () => replies[0](response("older", "chat-a", "stale.txt")));
     expect(document.body).not.toHaveTextContent("stale.txt");
-    expect(
-      screen.getByRole("button", { name: "Approve once" }),
-    ).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Approve once" })).toBeDisabled();
     await act(async () =>
       replies[1](
-        response(
-          next.arguments.attachmentId,
-          conversationId,
-          "current.txt",
-        ),
+        response(next.arguments.attachmentId, conversationId, "current.txt"),
       ),
     );
     expect(document.body).toHaveTextContent("current.txt · Upload 1");
-    expect(
-      screen.getByRole("button", { name: "Approve once" }),
-    ).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Approve once" })).toBeEnabled();
   },
 );
 
@@ -208,9 +194,7 @@ it.each(["conversation", "target", "approval"])(
       .mockImplementation(() => new Promise(() => {}));
     const { rerender } = render(card());
     await screen.findByText("report.txt · Upload 1");
-    expect(
-      screen.getByRole("button", { name: "Approve once" }),
-    ).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Approve once" })).toBeEnabled();
     const next = {
       ...approval,
       id: "next-approval",
@@ -221,9 +205,7 @@ it.each(["conversation", "target", "approval"])(
       },
     };
     rerender(card(next, change === "conversation" ? "chat-b" : "chat-a"));
-    expect(
-      screen.getByRole("button", { name: "Approve once" }),
-    ).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Approve once" })).toBeDisabled();
     expect(document.body).not.toHaveTextContent("report.txt · Upload 1");
   },
 );
@@ -248,9 +230,7 @@ it.each([
   });
   render(card());
   await screen.findByText(/Cannot identify the requested attachment/);
-  expect(
-    screen.getByRole("button", { name: "Approve once" }),
-  ).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Approve once" })).toBeDisabled();
 });
 
 it("renders filenames as text without bidi/control spoofing or loading media, retaining stale/expiry fences", async () => {
@@ -269,11 +249,7 @@ it("renders filenames as text without bidi/control spoofing or loading media, re
   );
   expect(container.textContent).not.toContain("\u202e");
   rerender(card({ ...approval, policyRevision: 5 }));
-  expect(
-    screen.getByRole("button", { name: "Approve once" }),
-  ).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Approve once" })).toBeDisabled();
   rerender(card({ ...approval, deadline: "2000-01-01T00:00:00Z" }));
-  expect(
-    screen.getByRole("button", { name: "Approve once" }),
-  ).toBeDisabled();
+  expect(screen.getByRole("button", { name: "Approve once" })).toBeDisabled();
 });
