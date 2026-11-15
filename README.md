@@ -4,6 +4,8 @@ A local chatbot demonstrating durable agent workflows with **Temporal, Go, Next.
 
 The app is single-user and localhost-only. It uses **qwen3.5:9b**; no hosted model or login is required.
 
+![Chat UI showing conversation history, a Temporal discussion, and the message composer](docs/images/chat-ui.png)
+
 ## Setup and run
 
 Install [mise](https://mise.jdx.dev/getting-started.html) and [Docker with Compose](https://docs.docker.com/get-started/get-docker/), then start Docker.

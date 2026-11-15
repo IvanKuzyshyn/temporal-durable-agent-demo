@@ -227,10 +227,6 @@ export function ChatShell({ conversationId }: { conversationId?: string }) {
             History unavailable: {error}
           </p>
         )}
-        <footer className="sidebar-footer">
-          <Icon kind="chat" />
-          <span>Local chat</span>
-        </footer>
       </aside>
       <main id="conversation" inert={mobile && sidebar}>
         <header className="topbar">
