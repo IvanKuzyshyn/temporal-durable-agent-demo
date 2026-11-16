@@ -6,6 +6,10 @@ The app is single-user and localhost-only. It uses **qwen3.5:9b**; no hosted mod
 
 ![Chat UI showing conversation history, a Temporal discussion, and the message composer](docs/images/chat-ui.png)
 
+## Note
+
+This repository is the companion demo for the article [Building Durable Agents with Temporal](https://www.kuzyshyn.me/articles/building-durable-agents-with-temporal).
+
 ## Setup and run
 
 Install [mise](https://mise.jdx.dev/getting-started.html) and [Docker with Compose](https://docs.docker.com/get-started/get-docker/), then start Docker.
